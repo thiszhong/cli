@@ -36,7 +36,7 @@ const htmlArray = [{
   {
       _html: 'login',
       title: '登录',
-      chunks: ['login']
+      chunks: ['vendor', 'login']
   },
 ];
 //自动生成html模板
@@ -55,16 +55,17 @@ module.exports = {
 		// 打包多出口文件
 		// 生成 a.bundle.js  b.bundle.js  jquery.bundle.js
 		filename: './js/[name].bundle.js'
-	},
+  },
+  stats: { children: false }, // 减少琐碎的打印
   devtool: devMode ? 'inline-source-map' : '',
   devServer: {
     contentBase: './dist',
-    publicPath: './',
+    publicPath: devMode ? '/' : './',
     open: true, // 开启自定打开浏览器
     hot: true // 热更新
   },
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: false}),
     new CopyWebpackPlugin([{
 			from: path.resolve(__dirname, 'src/assets'),
 			to: './assets'
