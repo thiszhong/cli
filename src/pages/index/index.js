@@ -1,1 +1,1 @@
-document.write('Hello index');
+alert('你来了');
