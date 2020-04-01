@@ -1,86 +1,41 @@
 const path = require('path');
-const glob = require('glob')
+var requireContext = require('require-context');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const PurgecssPlugin = require('purgecss-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+const plugins = require('./webpack.plugin');
+const rules = require('./webpack.rule');
 
 const devMode = process.env.NODE_ENV !== 'production';
-
-console.log(process.argv);
-
-var getHtmlConfig = function (name, chunks) {
-  return {
-      template: `./src/pages/${name}/index.html`,
-      filename: `${name}.html`,
-      // favicon: './favicon.ico',
-      // title: title,
-      inject: true,
-      hash: true, //开启hash  ?[hash]
-      chunks: chunks,//页面要引入的包
-      minify: process.env.NODE_ENV === "development" ? false : {
-          removeComments: false, //移除HTML中的注释
-          collapseWhitespace: false, //折叠空白区域 也就是压缩代码
-          removeAttributeQuotes: true, //去除属性引用
-      },
-  };
-};
-//配置页面
-const htmlArray = [{
-      _html: 'index',
-      title: '首页',
-      chunks: ['vendor', 'index']//页面用到的vendor模块
-  },
-  {
-      _html: 'login',
-      title: '登录',
-      chunks: ['vendor', 'login']
-  },
-];
-//自动生成html模板
-const htmlPlugins = htmlArray.map(item => {
-  return new HtmlWebpackPlugin(getHtmlConfig(item._html, item.chunks));
-})
+const outputPath = path.resolve(__dirname, 'dist');
 
 module.exports = {
-  entry: {
-		// 多入口文件
-    index: ['./src/pages/index/index.js',],
-    login: './src/pages/login/index.js',
-	},
-	output: {
-		path:path.resolve(__dirname, 'dist'),
-		// 打包多出口文件
-		// 生成 a.bundle.js  b.bundle.js  jquery.bundle.js
-		filename: './js/[name].bundle.js'
+  // 根据 src/pages 下文件名自动动态生成入口文件
+  // 后期需要可以 自定义打包参数 打包指定目录/项目
+  entry: () => {
+    const obj = {};
+    const entryFiles = requireContext(path.resolve(__dirname, './src/pages'), true, /index\.js$/);
+    entryFiles.keys().forEach(a => {
+      const arr = a.split('/')
+      // >1时 */login/index.html这种 取login
+      const name = arr.length > 1 ? arr[arr.length - 2] : arr[arr.length - 1].split('.')[0];
+      obj[name] = path.resolve(__dirname, './src/pages', a)
+    })
+    console.log(obj);
+    return obj;
+  },
+  output: {
+    hashDigestLength: 8,
+    path: outputPath,
+    filename: './js/[name].[hash].js'
   },
   stats: { children: false }, // 减少琐碎的打印
   devtool: devMode ? 'inline-source-map' : '',
   devServer: {
-    contentBase: './dist',
+    contentBase: outputPath,
     publicPath: devMode ? '/' : './',
     open: true, // 开启自定打开浏览器
     hot: true // 热更新
   },
-  plugins: [
-    new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: false}),
-    new CopyWebpackPlugin([{
-			from: path.resolve(__dirname, 'src/assets'),
-			to: './assets'
-		}]),
-    new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
-      filename: devMode ? '[name].css' : '[name].[hash].css',
-      chunkFilename: devMode ? '[id].css' : '[id].[hash].css',
-    }),
-    new PurgecssPlugin({
-      paths: glob.sync(`${path.join(__dirname, 'src')}/**/*`,  { nodir: true }),
-    }),
-    ...htmlPlugins,
-  ],
+  plugins: plugins,
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -105,41 +60,6 @@ module.exports = {
     'jquery': 'window.jQuery'
   },
   module: {
-    rules: [
-      {
-        test: /\.(css|less|scss|sass)$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-            options: {
-              esModule: false,
-              publicPath: "../",
-              hmr: process.env.NODE_ENV === 'development',
-            }
-          },
-          "css-loader", "less-loader", "sass-loader", "postcss-loader"
-        ]
-      },
-      {
-        test: /\.js$/,
-        use: {
-          loader: 'babel-loader'
-        },
-        // 不检查node_modules下的js文件
-        exclude: "/node_modules/"
-      },
-      {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [
-          'file-loader'
-        ]
-      },
-      {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-          'file-loader'
-        ]
-      }
-    ]
+    rules: rules
   }
-};
+}
