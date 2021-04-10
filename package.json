@@ -1,18 +1,21 @@
 {
-  "name": "vue-prerender",
-  "version": "0.1.0",
-  "private": true,
+  "name": "vue-prerender-template",
+  "version": "1.0.0",
+  "description": "由 `Vue cli` 搭建，`prerender-spa-plugin` 进行预渲染，`vue-meta` 管理/自定义 `head` 信息 的简单项目模板",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "dev": "vue-cli-service serve",
+    "build": "node prerender-routes/generator.js && vue-cli-service build",
+    "generateRoutes": "node prerender-routes/generator.js",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "core-js": "^3.6.5",
     "vue": "^2.6.11",
+    "vue-meta": "^2.4.0",
     "vue-router": "^3.2.0"
   },
   "devDependencies": {
+    "@dreysolano/prerender-spa-plugin": "^1.0.3",
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-router": "~4.5.0",
@@ -20,8 +23,29 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
+    "js-beautify": "^1.13.5",
     "less": "^3.0.4",
     "less-loader": "^5.0.0",
     "vue-template-compiler": "^2.6.11"
-  }
+  },
+  "keywords": [
+    "vue",
+    "prerender",
+    "vue-prerender",
+    "预渲染",
+    "SEO"
+  ],
+  "author": {
+    "name": "zhong",
+    "email": "384232149@qq.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wJianZhong/react-native-easy-downloader.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wJianZhong/react-native-easy-downloader/issues"
+  },
+  "homepage": "https://github.com/wJianZhong/react-native-easy-downloader#readme"
 }
