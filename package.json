@@ -42,10 +42,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wJianZhong/react-native-easy-downloader.git"
+    "url": "git+https://github.com/thiszhong/vue-prerender.git"
   },
   "bugs": {
-    "url": "https://github.com/wJianZhong/react-native-easy-downloader/issues"
+    "url": "https://github.com/thiszhong/vue-prerender/issues"
   },
-  "homepage": "https://github.com/wJianZhong/react-native-easy-downloader#readme"
+  "homepage": "https://github.com/thiszhong/vue-prerender#readme"
 }
